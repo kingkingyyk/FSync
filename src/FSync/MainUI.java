@@ -123,17 +123,17 @@ public class MainUI extends JFrame {
 	
 	public void setProgressBarMin (int v) {
 		progressBar.setMinimum(v);
-		progressBar.setString(String.format("%.2f%%",Math.min(0,progressBar.getPercentComplete()*100)));
+		progressBar.setString(String.format("%.2f%%",Math.max(0,progressBar.getPercentComplete()*100)));
 	}
 	
 	public void setProgressBarMax (int v) {
 		progressBar.setMaximum(v);
-		progressBar.setString(String.format("%.2f%%",Math.min(0,progressBar.getPercentComplete()*100)));
+		progressBar.setString(String.format("%.2f%%",Math.max(0,progressBar.getPercentComplete()*100)));
 	}
 	
 	public void setProgressBarValue (int v) {
 		progressBar.setValue(v);
-		progressBar.setString(String.format("%.2f%%",Math.min(0,progressBar.getPercentComplete()*100)));
+		progressBar.setString(String.format("%.2f%%",Math.max(0,progressBar.getPercentComplete()*100)));
 	}
 
 }

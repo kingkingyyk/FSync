@@ -10,7 +10,6 @@ public class Filex extends File {
 	
 	public Filex(String pathname) {
 		super(pathname);
-		calculateChecksum();
 	}
 
 	public void calculateChecksum() {
