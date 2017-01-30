@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-
 import javax.swing.UIManager;
 
 public class FSync {
@@ -131,7 +130,7 @@ public class FSync {
 	
 	public static String formatByte (long l) {
 		double value=(double)l;
-		String [] unit={"bytes","KB","MB","GB","TB","PB"};
+		String [] unit={" bytes"," KB"," MB"," GB"," TB"," PB"};
 		int unitIndex=0;
 		for (;unitIndex<unit.length && value>=1024;unitIndex++) value/=1024;
 		return String.format("%.2f",value)+unit[unitIndex];
@@ -142,7 +141,8 @@ public class FSync {
 		compareAndDeleteDest(src,dest);
 		long skip=compareAndCopy(src,dest);
 		if (!ui.hasFinalVerification() || (ui.hasFinalVerification() && verify(src,dest)))
-			Utility.showInformationMessage("Ya ho! We have skipped copying "+formatByte(skip)+"!");
+			if (skip==0) Utility.showInformationMessage("Done!");
+			else Utility.showInformationMessage("Ya ho! We have skipped copying "+formatByte(skip)+"!");
 		else Utility.showInformationMessage("Checksum error! You may try sync again.\nIf the problem still presists, there might be problem with your storage device.");
 		
 		ui.setButtonsEnabled(true);

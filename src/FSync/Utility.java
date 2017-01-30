@@ -55,11 +55,11 @@ public class Utility {
 	
 	public static void showErrorMessage (String text) {
 		Toolkit.getDefaultToolkit().beep();
-		JOptionPane.showMessageDialog(null,text,"FSync",JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(FSync.ui,text,"FSync",JOptionPane.ERROR_MESSAGE);
 	}
 	
 	public static void showInformationMessage (String text) {
 		Toolkit.getDefaultToolkit().beep();
-		JOptionPane.showMessageDialog(null,text,"FSync",JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(FSync.ui,text,"FSync",JOptionPane.INFORMATION_MESSAGE);
 	}
 }

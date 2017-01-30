@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 
 public class MainUI extends JFrame {
@@ -39,6 +40,7 @@ public class MainUI extends JFrame {
 		setTitle("FSync");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 440, 184);
+		setIconImage(new ImageIcon(getClass().getResource("/icon.png")).getImage());
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -60,7 +62,7 @@ public class MainUI extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fc=new JFileChooser(textFieldSource.getText());
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				if (fc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION) {
+				if (fc.showOpenDialog(MainUI.this)==JFileChooser.APPROVE_OPTION) {
 					textFieldSource.setText(fc.getSelectedFile().getAbsolutePath());
 				}
 			}
@@ -84,7 +86,7 @@ public class MainUI extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fc=new JFileChooser(textFieldDestination.getText());
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				if (fc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION) {
+				if (fc.showSaveDialog(MainUI.this)==JFileChooser.APPROVE_OPTION) {
 					textFieldDestination.setText(fc.getSelectedFile().getAbsolutePath());
 				}
 			}
@@ -132,7 +134,7 @@ public class MainUI extends JFrame {
 		contentPane.add(lblStatus);
 		
 		comboBoxIdentification = new JComboBox<>();
-		comboBoxIdentification.setModel(new DefaultComboBoxModel<String>(new String[] {"SHA Checksum", "Date Modified"}));
+		comboBoxIdentification.setModel(new DefaultComboBoxModel<String>(new String[] {"SHA-512 Checksum", "Date Modified"}));
 		comboBoxIdentification.setBounds(90, 70, 228, 20);
 		contentPane.add(comboBoxIdentification);
 		
@@ -170,7 +172,7 @@ public class MainUI extends JFrame {
 		this.btnDestination.setEnabled(flag);
 		this.comboBoxIdentification.setEnabled(flag);
 		this.btnSync.setEnabled(flag);
-		this.chckbxFinalVerification.setEnabled(false);
+		this.chckbxFinalVerification.setEnabled(flag);
 	}
 	
 	public FileIdentificationType getIdentificationType() {
