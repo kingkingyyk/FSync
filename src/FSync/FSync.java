@@ -17,7 +17,7 @@ public class FSync {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {}
 		
-		 ui=new MainUI();
+		ui=new MainUI();
 		ui.setLocationRelativeTo(null);
 		ui.setVisible(true);
 	}
@@ -46,7 +46,7 @@ public class FSync {
 		for (String s : toRemoveFiles) {
 			File f=new File(dest.getAbsolutePath()+s);
 			if (f.exists()) {
-				ui.setStatus("Deleting "+s);
+				ui.setStatus("Deleting "+f.getName());
 				count+=Utility.recurseDelete(f);
 				ui.setProgressBarValue((int)count);
 			}
@@ -71,38 +71,62 @@ public class FSync {
 
 		int barCurr=0;
 		ui.setProgressBarValue(0);
-		ui.setProgressBarMax(toCopyFiles.size());
+		ui.setProgressBarMax(srcFilesPath.size());
 		
-		long copyMaxCount=0;
 		long copySkippedCount=0;
 		for (String s : srcFilesPath) {
 			Filex srcF=new Filex(src.getAbsolutePath()+s,src.getAbsolutePath());
 			Filex destF=new Filex(dest.getAbsolutePath()+s,dest.getAbsolutePath());
-			ui.setStatus("Checking "+destF.getAbsolutePath());
+			ui.setStatus("Comparing "+destF.getName());
 			if (!destF.exists() || (destF.exists() && !srcF.equals(destF))) { //same file path but different checksum
-				ui.setStatus("Deleting "+s);
+				ui.setStatus("Deleting "+destF.getName());
 				destF.delete(); 
 				toCopyFiles.add(s);
-				copyMaxCount+=srcF.length();
 			} else copySkippedCount+=srcF.length();
 			ui.setProgressBarValue(++barCurr);
 		}
 		
 		ui.setProgressBarValue(0);
-		ui.setProgressBarMax((int)copyMaxCount);
+		ui.setProgressBarMax(toCopyFiles.size());
 		
 		Collections.sort(toCopyFiles,Collections.reverseOrder());
 		
-		long copiedCount=0;
+		int copiedCount=0;
 		for (String s : toCopyFiles) {
 			File srcF=new File(src.getPath()+s);
-			copiedCount+=srcF.length();
-			ui.setStatus("Copying "+s);
+			ui.setStatus("Copying "+srcF.getName());
 			Utility.autoCopy(srcF, src, dest);
-			ui.setProgressBarValue((int)copiedCount);
+			ui.setProgressBarValue(++copiedCount);
 		}
 		return copySkippedCount; 
 		//=================================================
+	}
+	
+	public static boolean verify (File src, File dest) {
+		ui.setStatus("Querying source files...");
+		HashSet<String> srcFilesPath=new HashSet<>();
+		for (String srcFilesP : Utility.getFileListPath(src)) srcFilesPath.add(srcFilesP.substring(src.getAbsolutePath().length(),srcFilesP.length()));
+		
+		ui.setStatus("Querying destination files...");
+		HashSet<String> destFilesPath=new HashSet<>();
+		for (String destFilesP : Utility.getFileListPath(dest)) destFilesPath.add(destFilesP.substring(dest.getAbsolutePath().length(),destFilesP.length()));
+		
+		HashSet<String> difference=new HashSet<>();
+		difference.addAll(srcFilesPath);
+		difference.removeAll(destFilesPath);
+		if (difference.size()!=0) return false;
+		
+		ui.setProgressBarValue(0);
+		ui.setProgressBarMax(srcFilesPath.size());
+		int progBarValue=0;
+		for (String s : srcFilesPath) {
+			Filex srcF=new Filex(src.getAbsolutePath()+s,src.getAbsolutePath());
+			Filex destF=new Filex(dest.getAbsolutePath()+s,dest.getAbsolutePath());
+			ui.setStatus("Verifying "+destF.getName());
+			if (!destF.exists() || !srcF.calculateSHA().equals(destF.calculateSHA())) return false;
+			ui.setProgressBarValue(++progBarValue);
+		}
+		return true;
 	}
 	
 	public static String formatByte (long l) {
@@ -117,9 +141,11 @@ public class FSync {
 		ui.setButtonsEnabled(false);
 		compareAndDeleteDest(src,dest);
 		long skip=compareAndCopy(src,dest);
+		if (!ui.hasFinalVerification() || (ui.hasFinalVerification() && verify(src,dest)))
+			Utility.showInformationMessage("Ya ho! We have skipped copying "+formatByte(skip)+"!");
+		else Utility.showInformationMessage("Checksum error! You may try sync again.\nIf the problem still presists, there might be problem with your storage device.");
 		
 		ui.setButtonsEnabled(true);
-		Utility.showInformationMessage("Ya ho! We have skipped copying "+formatByte(skip)+"!");
 		
 		ui.setProgressBarMax(1);
 		ui.setProgressBarValue(0);

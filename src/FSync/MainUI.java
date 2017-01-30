@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 
 public class MainUI extends JFrame {
 	private static final long serialVersionUID = 8100167928675856160L;
@@ -31,6 +32,7 @@ public class MainUI extends JFrame {
 	private JButton btnSource;
 	private JButton btnDestination;
 	private JButton btnSync;
+	private JCheckBox chckbxFinalVerification;
 
 	public MainUI() {
 		setResizable(false);
@@ -53,7 +55,7 @@ public class MainUI extends JFrame {
 		contentPane.add(textFieldSource);
 		textFieldSource.setColumns(10);
 		
-		btnSource = new JButton("Browse");
+		btnSource = new JButton("Browse...");
 		btnSource.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fc=new JFileChooser(textFieldSource.getText());
@@ -77,7 +79,7 @@ public class MainUI extends JFrame {
 		textFieldDestination.setBounds(90, 39, 235, 20);
 		contentPane.add(textFieldDestination);
 		
-		btnDestination = new JButton("Browse");
+		btnDestination = new JButton("Browse...");
 		btnDestination.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fc=new JFileChooser(textFieldDestination.getText());
@@ -131,12 +133,16 @@ public class MainUI extends JFrame {
 		
 		comboBoxIdentification = new JComboBox<>();
 		comboBoxIdentification.setModel(new DefaultComboBoxModel<String>(new String[] {"SHA Checksum", "Date Modified"}));
-		comboBoxIdentification.setBounds(90, 70, 235, 20);
+		comboBoxIdentification.setBounds(90, 70, 228, 20);
 		contentPane.add(comboBoxIdentification);
 		
 		JLabel lblIdentification = new JLabel("Identification :");
 		lblIdentification.setBounds(10, 73, 70, 14);
 		contentPane.add(lblIdentification);
+		
+		chckbxFinalVerification = new JCheckBox("Final Verification");
+		chckbxFinalVerification.setBounds(321, 71, 103, 23);
+		contentPane.add(chckbxFinalVerification);
 	}
 	
 	public void setStatus(String s) {
@@ -160,10 +166,11 @@ public class MainUI extends JFrame {
 	}
 	
 	public void setButtonsEnabled(boolean flag) {
-		btnSource.setEnabled(flag);
-		btnDestination.setEnabled(flag);
-		comboBoxIdentification.setEnabled(flag);
-		btnSync.setEnabled(flag);
+		this.btnSource.setEnabled(flag);
+		this.btnDestination.setEnabled(flag);
+		this.comboBoxIdentification.setEnabled(flag);
+		this.btnSync.setEnabled(flag);
+		this.chckbxFinalVerification.setEnabled(false);
 	}
 	
 	public FileIdentificationType getIdentificationType() {
@@ -176,5 +183,9 @@ public class MainUI extends JFrame {
 	
 	public File getDestinationFolder() {
 		return new File(textFieldDestination.getText());
+	}
+	
+	public boolean hasFinalVerification() {
+		return this.chckbxFinalVerification.isSelected();
 	}
 }

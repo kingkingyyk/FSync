@@ -13,26 +13,29 @@ public class Filex extends File {
 		this.rootPath=root;
 	}
 
-	public String calculateChecksum() {
+	public String calculateSHA() {
+		try {
+		    MessageDigest md = MessageDigest.getInstance("SHA-512");
+		    FileInputStream fis = new FileInputStream(this);
+		    
+		    byte[] dataBytes = new byte[1024];
+		    int nread = 0;
+		    while ((nread = fis.read(dataBytes)) != -1) md.update(dataBytes, 0, nread);
+	
+		    fis.close();
+		    byte[] mdbytes = md.digest();
+		    StringBuffer sb = new StringBuffer("");
+		    for (int i = 0; i < mdbytes.length; i++) sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+		    
+		    return sb.toString();
+		} catch (Exception e) {}
+		return "";
+	}
+	
+	private String calculateChecksum() {
 		if (FSync.ui.getIdentificationType()==FSync.FileIdentificationType.SHA1) {
-			if (!this.isDirectory()) {
-				try {
-				    MessageDigest md = MessageDigest.getInstance("SHA1");
-				    FileInputStream fis = new FileInputStream(this);
-				    
-				    byte[] dataBytes = new byte[1024];
-				    int nread = 0;
-				    while ((nread = fis.read(dataBytes)) != -1) md.update(dataBytes, 0, nread);
-			
-				    fis.close();
-				    byte[] mdbytes = md.digest();
-				    StringBuffer sb = new StringBuffer("");
-				    for (int i = 0; i < mdbytes.length; i++) sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
-				    
-				    return sb.toString();
-				} catch (Exception e) {}
-				return "";
-			} else return this.getAbsolutePath().substring(this.rootPath.length(),this.getAbsolutePath().length());
+			if (!this.isDirectory()) return calculateSHA();
+			else return this.getAbsolutePath().substring(this.rootPath.length(),this.getAbsolutePath().length());
 		} else {
 			StringBuilder sb=new StringBuilder();
 			if (!this.isDirectory()) sb.append(this.lastModified());
