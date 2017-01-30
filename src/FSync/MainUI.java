@@ -102,6 +102,7 @@ public class MainUI extends JFrame {
 				File dest=new File(textFieldDestination.getText());
 				if (textFieldSource.getText().isEmpty() || !src.exists()) Utility.showErrorMessage("Source folder is not accessible.");
 				else if (textFieldDestination.getText().isEmpty() || !dest.exists()) Utility.showErrorMessage("Destination folder is not accessible.");
+				else if (src.equals(dest)) Utility.showErrorMessage("Source and destination must be different!");
 				else {
 					btnSync.setEnabled(false);
 					Thread t=new Thread() {
