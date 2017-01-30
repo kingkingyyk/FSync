@@ -7,7 +7,8 @@ import javax.swing.UIManager;
 public class FSync {
 
 	public static MainUI ui;
-	
+	public static enum FileIdentificationType {SHA1,MODIFIEDDATE};
+
 	public static void main (String [] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -19,10 +20,13 @@ public class FSync {
 	}
 	
 	public static void sync (File src, File dest) throws Exception {
+		ui.setButtonsEnabled(false);
 		ui.setStatus("Querying source files...");
 		ArrayList<Filex> srcFiles=Utility.getFileList(src);
+		srcFiles.remove(0);
 		ui.setStatus("Querying destination files...");
 		ArrayList<Filex> destFiles=Utility.getFileList(dest);
+		destFiles.remove(0);
 		
 		ui.setProgressBarValue(0);
 		ui.setProgressBarMax(srcFiles.size());
@@ -74,7 +78,11 @@ public class FSync {
 			ui.setProgressBarValue(++count);
 		}
 		
+		ui.setButtonsEnabled(true);
 		Utility.showInformationMessage("Ya ho! We have skipped copying "+union.size()+" folders & files!");
+		
+		ui.setProgressBarMax(1);
+		ui.setProgressBarValue(0);
 	}
 
 }

@@ -3,6 +3,9 @@ package FSync;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import FSync.FSync.FileIdentificationType;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -11,20 +14,29 @@ import javax.swing.SwingConstants;
 import javax.swing.JProgressBar;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class MainUI extends JFrame {
 	private static final long serialVersionUID = 8100167928675856160L;
+	private static final DecimalFormat doubleFormatter=new DecimalFormat("0.00%");
 	private JPanel contentPane;
 	private JTextField textFieldSource;
 	private JTextField textFieldDestination;
 	private JProgressBar progressBar;
 	private JLabel lblStatus;
+	private JComboBox<String> comboBoxIdentification;
+	private JButton btnSource;
+	private JButton btnDestination;
+	private JButton btnSync;
 
 	public MainUI() {
+		setResizable(false);
 		setTitle("FSync");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 168);
+		setBounds(100, 100, 440, 184);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -32,19 +44,19 @@ public class MainUI extends JFrame {
 		
 		JLabel lblSource = new JLabel("Source :");
 		lblSource.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblSource.setBounds(10, 11, 61, 14);
+		lblSource.setBounds(10, 11, 70, 14);
 		contentPane.add(lblSource);
 		
 		textFieldSource = new JTextField();
 		textFieldSource.setEnabled(false);
-		textFieldSource.setBounds(81, 8, 244, 20);
+		textFieldSource.setBounds(90, 8, 235, 20);
 		contentPane.add(textFieldSource);
 		textFieldSource.setColumns(10);
 		
-		JButton btnSource = new JButton("Browse");
+		btnSource = new JButton("Browse");
 		btnSource.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fc=new JFileChooser();
+				JFileChooser fc=new JFileChooser(textFieldSource.getText());
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				if (fc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION) {
 					textFieldSource.setText(fc.getSelectedFile().getAbsolutePath());
@@ -56,34 +68,34 @@ public class MainUI extends JFrame {
 		
 		JLabel lblDestination = new JLabel("Destination :");
 		lblDestination.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblDestination.setBounds(10, 42, 61, 14);
+		lblDestination.setBounds(10, 42, 70, 14);
 		contentPane.add(lblDestination);
 		
 		textFieldDestination = new JTextField();
 		textFieldDestination.setEnabled(false);
 		textFieldDestination.setColumns(10);
-		textFieldDestination.setBounds(81, 39, 244, 20);
+		textFieldDestination.setBounds(90, 39, 235, 20);
 		contentPane.add(textFieldDestination);
 		
-		JButton buttonDestination = new JButton("Browse");
-		buttonDestination.addActionListener(new ActionListener() {
+		btnDestination = new JButton("Browse");
+		btnDestination.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fc=new JFileChooser();
+				JFileChooser fc=new JFileChooser(textFieldDestination.getText());
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				if (fc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION) {
 					textFieldDestination.setText(fc.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
-		buttonDestination.setBounds(335, 38, 89, 23);
-		contentPane.add(buttonDestination);
+		btnDestination.setBounds(335, 38, 89, 23);
+		contentPane.add(btnDestination);
 		
 		progressBar = new JProgressBar();
-		progressBar.setBounds(10, 71, 414, 23);
+		progressBar.setBounds(10, 101, 414, 23);
 		progressBar.setStringPainted(true);
 		contentPane.add(progressBar);
 		
-		JButton btnSync = new JButton("Sync");
+		btnSync = new JButton("Sync");
 		btnSync.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File src=new File(textFieldSource.getText());
@@ -109,12 +121,21 @@ public class MainUI extends JFrame {
 				}
 			}
 		});
-		btnSync.setBounds(324, 101, 100, 23);
+		btnSync.setBounds(324, 129, 100, 23);
 		contentPane.add(btnSync);
 		
 		lblStatus = new JLabel("Ready");
-		lblStatus.setBounds(10, 105, 304, 14);
+		lblStatus.setBounds(10, 133, 304, 14);
 		contentPane.add(lblStatus);
+		
+		comboBoxIdentification = new JComboBox<>();
+		comboBoxIdentification.setModel(new DefaultComboBoxModel<String>(new String[] {"SHA Checksum", "Date Modified"}));
+		comboBoxIdentification.setBounds(90, 70, 235, 20);
+		contentPane.add(comboBoxIdentification);
+		
+		JLabel lblIdentification = new JLabel("Identification :");
+		lblIdentification.setBounds(10, 73, 70, 14);
+		contentPane.add(lblIdentification);
 	}
 	
 	public void setStatus(String s) {
@@ -123,17 +144,36 @@ public class MainUI extends JFrame {
 	
 	public void setProgressBarMin (int v) {
 		progressBar.setMinimum(v);
-		progressBar.setString(String.format("%.2f%%",Math.max(0,progressBar.getPercentComplete()*100)));
+		progressBar.setString(doubleFormatter.format((double)progressBar.getValue()/progressBar.getMaximum()));
 	}
 	
 	public void setProgressBarMax (int v) {
+		v=Math.max(v,1);
 		progressBar.setMaximum(v);
-		progressBar.setString(String.format("%.2f%%",Math.max(0,progressBar.getPercentComplete()*100)));
+		progressBar.setString(doubleFormatter.format((double)progressBar.getValue()/progressBar.getMaximum()));
 	}
 	
 	public void setProgressBarValue (int v) {
 		progressBar.setValue(v);
-		progressBar.setString(String.format("%.2f%%",Math.max(0,progressBar.getPercentComplete()*100)));
+		progressBar.setString(doubleFormatter.format((double)progressBar.getValue()/progressBar.getMaximum()));
 	}
-
+	
+	public void setButtonsEnabled(boolean flag) {
+		btnSource.setEnabled(flag);
+		btnDestination.setEnabled(flag);
+		comboBoxIdentification.setEnabled(flag);
+		btnSync.setEnabled(flag);
+	}
+	
+	public FileIdentificationType getIdentificationType() {
+		return FileIdentificationType.values()[comboBoxIdentification.getSelectedIndex()];
+	}
+	
+	public File getSourceFolder() {
+		return new File(textFieldSource.getText());
+	}
+	
+	public File getDestinationFolder() {
+		return new File(textFieldDestination.getText());
+	}
 }
